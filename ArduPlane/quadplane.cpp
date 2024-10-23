@@ -1754,7 +1754,7 @@ void SLT_Transition::update()
         // control surfaces at this stage.
         // We disable this for vectored yaw tilt rotors as they do need active
         // yaw control throughout the transition
-        if (!quadplane.tiltrotor.is_vectored()) {
+        if (!quadplane.tiltrotor.is_vectored() && !quadplane.option_is_set(QuadPlane::OPTION::FORCE_TRANSITION_TILT_YAW)) {
             quadplane.attitude_control->reset_yaw_target_and_rate();
             quadplane.attitude_control->rate_bf_yaw_target(0.0);
         }
