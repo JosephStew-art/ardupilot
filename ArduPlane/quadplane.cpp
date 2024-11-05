@@ -1757,6 +1757,12 @@ void SLT_Transition::update()
             quadplane.attitude_control->reset_yaw_target_and_rate();
             quadplane.attitude_control->rate_bf_yaw_target(0.0);
         }
+
+        // log the throttle data for throttle ramping issue debugging
+        #if HAL_LOGGING_ENABLED
+        quadplane.log_transition_throttles();
+        #endif   
+
         break;
     }
 
@@ -3734,6 +3740,22 @@ void QuadPlane::Log_Write_QControl_Tuning()
 
     // write multicopter position control message
     pos_control->write_log();
+}
+
+// Write transition throttle data
+void QuadPlane::log_transition_throttles()
+{
+    struct log_QTTR pkt = {
+        LOG_PACKET_HEADER_INIT(LOG_QTTR_MSG),
+        time_us             : AP_HAL::micros64(),
+        last_throttle       : last_throttle,
+        transition_scaled   : transition_scaled,
+        throttle_scaled     : throttle_scaled,
+        ratio              : ratio,
+        fw_throttle        : fw_throttle,
+        current_tilt       : tiltrotor.current_tilt,
+    };
+    plane.logger.WriteBlock(&pkt, sizeof(pkt));
 }
 #endif
 

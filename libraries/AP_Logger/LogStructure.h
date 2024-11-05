@@ -1223,6 +1223,9 @@ struct PACKED log_VER {
       "MULT", "Qbd",      "TimeUS,Id,Mult", "s--","F--" },   \
     { LOG_PARAMETER_MSG, sizeof(log_Parameter), \
      "PARM", "QNff",        "TimeUS,Name,Value,Default", "s---", "F---"  },       \
+    // quad tilt transition message
+    { LOG_QTTR_MSG, sizeof(log_QTTR), \
+      "QTTR", "Qffffff",  "TimeUS,LThrot,TranScl,ThrotScl,Ratio,FwThrot,Tilt", "s------", "F------" , true }, \
 LOG_STRUCTURE_FROM_GPS \
     { LOG_MESSAGE_MSG, sizeof(log_Message), \
       "MSG",  "QZ",     "TimeUS,Message", "s-", "F-"}, \
@@ -1343,6 +1346,10 @@ LOG_STRUCTURE_FROM_AIS \
 
 // message types for common messages
 enum LogMessages : uint8_t {
+
+    // quad tilt transition message
+    LOG_QTTR_MSG = 40,
+
     LOG_PARAMETER_MSG = 32,
     LOG_IDS_FROM_NAVEKF2,
     LOG_IDS_FROM_NAVEKF3,
