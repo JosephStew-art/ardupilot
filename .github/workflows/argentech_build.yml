@@ -8,8 +8,7 @@ name: ArgenTech Build
 on:
   push:
     branches:
-      - ArgenTech
-      - master
+      - logging_testing_throttle_ramping
     paths-ignore:
       # remove non chibios HAL
       - 'libraries/AP_HAL_Linux/**'
@@ -70,6 +69,8 @@ on:
       - '.github/workflows/test_environment.yml'
 
   pull_request:
+    branches:
+      - logging_testing_throttle_ramping
     paths-ignore:
       # remove non chibios HAL
       - 'libraries/AP_HAL_Linux/**'
