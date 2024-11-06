@@ -2,6 +2,8 @@ name: Cygwin Build
 
 on:
   push:
+    branches:
+      - logging_testing_throttle_ramping
     paths-ignore:
       # remove other vehicles
       - 'AntennaTracker/**'
@@ -68,6 +70,8 @@ on:
       - '.github/workflows/test_environment.yml'
 
   pull_request:
+    branches:
+      - logging_testing_throttle_ramping
     paths-ignore:
       # remove other vehicles
       - 'AntennaTracker/**'
