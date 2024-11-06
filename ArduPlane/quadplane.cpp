@@ -1752,14 +1752,7 @@ void SLT_Transition::update()
             const float ratio = (constrain_float(quadplane.tiltrotor.current_tilt, airspeed_reached_tilt, quadplane.tiltrotor.get_fully_forward_tilt()) - airspeed_reached_tilt) / (quadplane.tiltrotor.get_fully_forward_tilt() - airspeed_reached_tilt);
             const float fw_throttle = MAX(SRV_Channels::get_output_scaled(SRV_Channel::k_throttle),0) * 0.01;
             throttle_scaled = constrain_float(throttle_scaled * (1.0-ratio) + fw_throttle * ratio, 0.0, 1.0);
-            // AP::logger().Write("TEST", "transitionscale,lastthrottle,throttlescaledstore,currenttilt,ratio,fwthrottle,throttlescaled","fffffff",
-            //        transition_scale,
-            //        last_throttle,
-            //        throttle_scaled_store,
-            //        quadplane.tiltrotor.current_tilt,
-            //        ratio,
-            //        fw_throttle,
-            //        throttle_scaled);
+
             AP::logger().Write("TEST", "THRScaled",
                    "s", // units: %, %
                    "0", // mult: 1, 1
