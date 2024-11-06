@@ -164,12 +164,7 @@ public:
     struct PACKED log_QTTR {
         LOG_PACKET_HEADER;
         uint64_t time_us;
-        float last_throttle;
-        float transition_scaled;
         float throttle_scaled;
-        float ratio;
-        float fw_throttle;
-        float current_tilt;
     };
 
     MAV_TYPE get_mav_type(void) const;
@@ -239,7 +234,7 @@ private:
     AC_CommandModel command_model_pilot{100.0, 0.25, 0.25};
 
     // quad tilt transition logging functionality
-    void log_transition_throttles();
+    void log_transition_throttles(float throttle_scaled);
 
     // helper functions to set and disable time constant from command model
     void set_pilot_yaw_rate_time_constant();

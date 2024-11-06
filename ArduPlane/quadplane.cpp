@@ -1736,12 +1736,16 @@ void SLT_Transition::update()
             // will stop stabilizing
             throttle_scaled = 0.01;
         }
+
+        float ratio = 0.0f;
+        float fw_throttle = 0.0f;
+
         if (quadplane.tiltrotor.enabled() && !quadplane.tiltrotor.has_vtol_motor() && !quadplane.tiltrotor.has_fw_motor()) {
             // All motors tilting, Use a combination of vertical and forward throttle based on curent tilt angle
             // scale from all VTOL throttle at airspeed_reached_tilt to all forward throttle at fully forward tilt
             // this removes a step change in throttle once assistance is stoped
-            const float ratio = (constrain_float(quadplane.tiltrotor.current_tilt, airspeed_reached_tilt, quadplane.tiltrotor.get_fully_forward_tilt()) - airspeed_reached_tilt) / (quadplane.tiltrotor.get_fully_forward_tilt() - airspeed_reached_tilt);
-            const float fw_throttle = MAX(SRV_Channels::get_output_scaled(SRV_Channel::k_throttle),0) * 0.01;
+            ratio = (constrain_float(quadplane.tiltrotor.current_tilt, airspeed_reached_tilt, quadplane.tiltrotor.get_fully_forward_tilt()) - airspeed_reached_tilt) / (quadplane.tiltrotor.get_fully_forward_tilt() - airspeed_reached_tilt);
+            fw_throttle = MAX(SRV_Channels::get_output_scaled(SRV_Channel::k_throttle),0) * 0.01;
             throttle_scaled = constrain_float(throttle_scaled * (1.0-ratio) + fw_throttle * ratio, 0.0, 1.0);
         }
         quadplane.assisted_flight = true;
@@ -1760,9 +1764,9 @@ void SLT_Transition::update()
 
         // log the throttle data for throttle ramping issue debugging
         #if HAL_LOGGING_ENABLED
-        quadplane.log_transition_throttles();
-        #endif   
-
+        quadplane.log_transition_throttles(throttle_scaled);
+        #endif
+        
         break;
     }
 
@@ -3743,17 +3747,12 @@ void QuadPlane::Log_Write_QControl_Tuning()
 }
 
 // Write transition throttle data
-void QuadPlane::log_transition_throttles()
+void QuadPlane::log_transition_throttles(float throttle_scaled)
 {
     struct log_QTTR pkt = {
         LOG_PACKET_HEADER_INIT(LOG_QTTR_MSG),
         time_us             : AP_HAL::micros64(),
-        last_throttle       : last_throttle,
-        transition_scaled   : transition_scaled,
         throttle_scaled     : throttle_scaled,
-        ratio              : ratio,
-        fw_throttle        : fw_throttle,
-        current_tilt       : tiltrotor.current_tilt,
     };
     plane.logger.WriteBlock(&pkt, sizeof(pkt));
 }
