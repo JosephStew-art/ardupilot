@@ -239,7 +239,9 @@ private:
     AC_CommandModel command_model_pilot{100.0, 0.25, 0.25};
 
     // quad tilt transition logging functionality
-    void log_transition_throttles();
+    void log_transition_throttles(float last_throttle, float transition_scale,
+                                float throttle_scaled, float ratio,
+                                float fw_throttle);
 
     // helper functions to set and disable time constant from command model
     void set_pilot_yaw_rate_time_constant();

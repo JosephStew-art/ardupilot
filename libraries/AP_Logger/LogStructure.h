@@ -180,6 +180,18 @@ struct PACKED log_Format {
     char name[4];
     char format[16];
     char labels[64];
+};  
+
+// added in log structure definition
+struct PACKED log_QTTR {
+    LOG_PACKET_HEADER;
+    uint64_t time_us;
+    float last_throttle;
+    float transition_scaled;
+    float throttle_scaled;
+    float ratio;
+    float fw_throttle;
+    float current_tilt;
 };
 
 struct PACKED log_Unit {
@@ -1223,7 +1235,6 @@ struct PACKED log_VER {
       "MULT", "Qbd",      "TimeUS,Id,Mult", "s--","F--" },   \
     { LOG_PARAMETER_MSG, sizeof(log_Parameter), \
      "PARM", "QNff",        "TimeUS,Name,Value,Default", "s---", "F---"  },       \
-    // quad tilt transition message
     { LOG_QTTR_MSG, sizeof(log_QTTR), \
       "QTTR", "Qffffff",  "TimeUS,LThrot,TranScl,ThrotScl,Ratio,FwThrot,Tilt", "s------", "F------" , true }, \
 LOG_STRUCTURE_FROM_GPS \
