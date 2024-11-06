@@ -4,6 +4,8 @@
 
 #include "AC_AttitudeControl/AC_AttitudeControl_TS.h"
 
+#include <AP_Logger/AP_Logger.h>
+
 const AP_Param::GroupInfo QuadPlane::var_info[] = {
 
     // @Param: ENABLE
@@ -280,6 +282,7 @@ const AP_Param::GroupInfo QuadPlane::var_info[] = {
     // @Bitmask: 20: Force RTL mode-forces RTL mode on rc failsafe in VTOL modes overriding bit 5(USE_QRTL)
     // @Bitmask: 21: Tilt rotor-tilt motors up when disarmed in FW modes (except manual) to prevent ground strikes.
     // @Bitmask: 22: Scale FF by the ratio of VTOL/plane angle P gains in VTOL modes rather than reducing VTOL angle P based on airspeed.
+    // @Bitmask: 23: Force yaw control in transition for tiltrotors
     AP_GROUPINFO("OPTIONS", 58, QuadPlane, options, 0),
 
     AP_SUBGROUPEXTENSION("",59, QuadPlane, var_info2),
@@ -1680,7 +1683,7 @@ void SLT_Transition::update()
         }
         quadplane.hold_hover(climb_rate_cms);
 
-        if (!quadplane.tiltrotor.is_vectored()) {
+        if (!quadplane.tiltrotor.is_vectored() && !quadplane.option_is_set(QuadPlane::OPTION::FORCE_TRANSITION_TILT_YAW)) {
             // set desired yaw to current yaw in both desired angle
             // and rate request. This reduces wing twist in transition
             // due to multicopter yaw demands. This is disabled when
@@ -1690,6 +1693,7 @@ void SLT_Transition::update()
             quadplane.attitude_control->reset_yaw_target_and_rate();
             quadplane.attitude_control->rate_bf_yaw_target(0.0);
         }
+
         if (quadplane.tiltrotor.enabled() && !quadplane.tiltrotor.has_fw_motor()) {
             // tilt rotors without decidated fw motors do not have forward throttle output in this stage
             // prevent throttle I wind up
@@ -1725,6 +1729,11 @@ void SLT_Transition::update()
 
         float transition_scale = (trans_time_ms - transition_timer_ms) / trans_time_ms;
         float throttle_scaled = last_throttle * transition_scale;
+        AP::logger().Write("TEST1", "Transscale",
+                "s", // units: %, %
+                "0", // mult: 1, 1
+                "f", // format: float, float
+                transition_scale);
 
         // set zero throttle mix, to give full authority to
         // throttle. This ensures that the fixed wing controllers get
@@ -1736,7 +1745,6 @@ void SLT_Transition::update()
             // will stop stabilizing
             throttle_scaled = 0.01;
         }
-
         if (quadplane.tiltrotor.enabled() && !quadplane.tiltrotor.has_vtol_motor() && !quadplane.tiltrotor.has_fw_motor()) {
             // All motors tilting, Use a combination of vertical and forward throttle based on curent tilt angle
             // scale from all VTOL throttle at airspeed_reached_tilt to all forward throttle at fully forward tilt
@@ -1744,6 +1752,19 @@ void SLT_Transition::update()
             const float ratio = (constrain_float(quadplane.tiltrotor.current_tilt, airspeed_reached_tilt, quadplane.tiltrotor.get_fully_forward_tilt()) - airspeed_reached_tilt) / (quadplane.tiltrotor.get_fully_forward_tilt() - airspeed_reached_tilt);
             const float fw_throttle = MAX(SRV_Channels::get_output_scaled(SRV_Channel::k_throttle),0) * 0.01;
             throttle_scaled = constrain_float(throttle_scaled * (1.0-ratio) + fw_throttle * ratio, 0.0, 1.0);
+            // AP::logger().Write("TEST", "transitionscale,lastthrottle,throttlescaledstore,currenttilt,ratio,fwthrottle,throttlescaled","fffffff",
+            //        transition_scale,
+            //        last_throttle,
+            //        throttle_scaled_store,
+            //        quadplane.tiltrotor.current_tilt,
+            //        ratio,
+            //        fw_throttle,
+            //        throttle_scaled);
+            AP::logger().Write("TEST", "THRScaled",
+                   "s", // units: %, %
+                   "0", // mult: 1, 1
+                   "f", // format: float, float
+                   throttle_scaled);
         }
         quadplane.assisted_flight = true;
         quadplane.hold_stabilize(throttle_scaled);
@@ -1758,7 +1779,6 @@ void SLT_Transition::update()
             quadplane.attitude_control->reset_yaw_target_and_rate();
             quadplane.attitude_control->rate_bf_yaw_target(0.0);
         }
-        
         break;
     }
 
@@ -3736,24 +3756,6 @@ void QuadPlane::Log_Write_QControl_Tuning()
 
     // write multicopter position control message
     pos_control->write_log();
-}
-
-// Write transition throttle data
-void QuadPlane::log_transition_throttles(float _last_throttle, float _transition_scaled, 
-                                       float _throttle_scaled, float _ratio, 
-                                       float _fw_throttle)
-{
-    struct log_QTTR pkt = {
-        LOG_PACKET_HEADER_INIT(LOG_QTTR_MSG),
-        time_us             : AP_HAL::micros64(),
-        last_throttle       : _last_throttle,
-        transition_scaled   : _transition_scaled,
-        throttle_scaled     : _throttle_scaled,
-        ratio              : _ratio,
-        fw_throttle        : _fw_throttle,
-        current_tilt       : tiltrotor.current_tilt,
-    };
-    plane.logger.WriteBlock(&pkt, sizeof(pkt));
 }
 #endif
 

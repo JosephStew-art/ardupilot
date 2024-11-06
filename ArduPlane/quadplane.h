@@ -160,13 +160,6 @@ public:
         uint8_t  assist;
     };
 
-    // quad tilt transition message
-    struct PACKED log_QTTR {
-        LOG_PACKET_HEADER;
-        uint64_t time_us;
-        float throttle_scaled;
-    };
-
     MAV_TYPE get_mav_type(void) const;
 
     enum Q_ASSIST_STATE_ENUM {
@@ -232,10 +225,6 @@ private:
     // Command model parameter class
     // Default max rate, default expo, default time constant
     AC_CommandModel command_model_pilot{100.0, 0.25, 0.25};
-
-    // quad tilt transition logging functionality
-    void log_transition_throttles(float throttle_scaled);
-
     // helper functions to set and disable time constant from command model
     void set_pilot_yaw_rate_time_constant();
     void disable_yaw_rate_time_constant();
@@ -629,6 +618,7 @@ private:
         FS_RTL=(1<<20),
         DISARMED_TILT_UP=(1<<21),
         SCALE_FF_ANGLE_P=(1<<22),
+        FORCE_TRANSITION_TILT_YAW=(1<<23),
     };
     bool option_is_set(OPTION option) const {
         return (options.get() & int32_t(option)) != 0;
