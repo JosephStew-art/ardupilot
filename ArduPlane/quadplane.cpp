@@ -1727,47 +1727,52 @@ void SLT_Transition::update()
             gcs().send_text(MAV_SEVERITY_INFO, "Transition done");
         }
 
-        float transition_scale = (trans_time_ms - transition_timer_ms) / trans_time_ms;
+        // Modified transition scale using a smoother curve
+        float transition_progress = transition_timer_ms / trans_time_ms;
+        float transition_scale = cosf(M_PI_2 * transition_progress); // Creates a smoother decay
         float throttle_scaled = last_throttle * transition_scale;
-        AP::logger().Write("TEST1", "Transscale",
-                "s", // units: %, %
-                "0", // mult: 1, 1
-                "f", // format: float, float
-                transition_scale);
+        float throttle_scaled_old = throttle_scaled;
 
-        // set zero throttle mix, to give full authority to
-        // throttle. This ensures that the fixed wing controllers get
-        // a chance to learn the right integrators during the transition
+        // set throttle mix with smoother transition
         quadplane.attitude_control->set_throttle_mix_value(0.5*transition_scale);
 
         if (throttle_scaled < 0.01) {
-            // ensure we don't drop all the way to zero or the motors
-            // will stop stabilizing
             throttle_scaled = 0.01;
         }
+        
         if (quadplane.tiltrotor.enabled() && !quadplane.tiltrotor.has_vtol_motor() && !quadplane.tiltrotor.has_fw_motor()) {
-            // All motors tilting, Use a combination of vertical and forward throttle based on curent tilt angle
-            // scale from all VTOL throttle at airspeed_reached_tilt to all forward throttle at fully forward tilt
-            // this removes a step change in throttle once assistance is stoped
-            const float ratio = (constrain_float(quadplane.tiltrotor.current_tilt, airspeed_reached_tilt, quadplane.tiltrotor.get_fully_forward_tilt()) - airspeed_reached_tilt) / (quadplane.tiltrotor.get_fully_forward_tilt() - airspeed_reached_tilt);
+            // Modified blending for smoother transition
+            const float current_tilt = quadplane.tiltrotor.current_tilt;
+            const float full_forward = quadplane.tiltrotor.get_fully_forward_tilt();
+            
+            // Modified ratio calculation with smooth interpolation
+            const float ratio = (constrain_float(current_tilt, airspeed_reached_tilt, full_forward) - airspeed_reached_tilt) / (full_forward - airspeed_reached_tilt);
+            const float smoothed_ratio = (1.0f - cosf(ratio * M_PI_2)); // Smooth acceleration
+            
             const float fw_throttle = MAX(SRV_Channels::get_output_scaled(SRV_Channel::k_throttle),0) * 0.01;
-            throttle_scaled = constrain_float(throttle_scaled * (1.0-ratio) + fw_throttle * ratio, 0.0, 1.0);
+            
+            // Blend throttles with modified weighting
+            throttle_scaled = constrain_float(
+                throttle_scaled * (1.0f - smoothed_ratio) + 
+                fw_throttle * smoothed_ratio,
+                0.0f, 
+                1.0f
+            );
 
-            AP::logger().Write("TEST", "THRScaled",
-                   "s", // units: %, %
-                   "0", // mult: 1, 1
-                   "f", // format: float, float
-                   throttle_scaled);
+            AP::logger().Write("TEST", "TimeUS,thrscal,fwthr,ratio,lastthr,thrscal1",
+                   "smmmmm",
+                   "F00000",
+                   "Qfffff",
+                   AP_HAL::micros64(),
+                   throttle_scaled,
+                   fw_throttle,
+                   ratio,
+                   last_throttle,
+                   throttle_scaled_old);
         }
         quadplane.assisted_flight = true;
         quadplane.hold_stabilize(throttle_scaled);
 
-        // set desired yaw to current yaw in both desired angle and
-        // rate request while waiting for transition to
-        // complete. Navigation should be controlled by fixed wing
-        // control surfaces at this stage.
-        // We disable this for vectored yaw tilt rotors as they do need active
-        // yaw control throughout the transition
         if (!quadplane.tiltrotor.is_vectored()) {
             quadplane.attitude_control->reset_yaw_target_and_rate();
             quadplane.attitude_control->rate_bf_yaw_target(0.0);
