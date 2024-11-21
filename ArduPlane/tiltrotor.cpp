@@ -168,6 +168,9 @@ float Tiltrotor::tilt_max_change(bool up, bool in_flap_range) const
     float rate;
     if (up || max_rate_down_dps <= 0) {
         rate = max_rate_up_dps;
+    } else if (transition->transition_state == Tiltrotor_Transition::TRANSITION_TIMER) {
+        // Use the final tilt rate for the second part of transition
+        rate = max_rate_down_final_dps > 0 ? max_rate_down_final_dps : max_rate_down_dps;
     } else {
         rate = max_rate_down_dps;
     }
@@ -180,8 +183,6 @@ float Tiltrotor::tilt_max_change(bool up, bool in_flap_range) const
             fast_tilt = true;
         }
         if (fast_tilt) {
-            // allow a minimum of 90 DPS in manual or if we are not
-            // stabilising, to give fast control
             rate = MAX(rate, 90);
         }
     }
