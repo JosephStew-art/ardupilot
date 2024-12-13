@@ -183,8 +183,6 @@ float Tiltrotor::tilt_max_change(bool up, bool in_flap_range) const
             fast_tilt = true;
         }
         if (fast_tilt) {
-            // allow a minimum of 90 DPS in manual or if we are not
-            // stabilising, to give fast control
             rate = MAX(rate, 90);
         }
     }
