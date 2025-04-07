@@ -2764,6 +2764,7 @@ class AutoTestCopter(vehicle_test_suite.TestSuite):
         })
 
         # Wait for the expected status message about GPS 2
+<<<<<<< HEAD
         # Add a delay to allow the GPS to initialize
         self.progress("Waiting for GPS 2 to initialize...")
         self.delay_sim_time(10)  # Add a delay to allow time for GPS initialization
@@ -2782,6 +2783,9 @@ class AutoTestCopter(vehicle_test_suite.TestSuite):
             self.progress("Found 'gps 2: specified as dronecan' message")
         except Exception as e:
             self.progress("Did not find 'gps 2: specified as dronecan' message, continuing anyway: %s" % str(e))
+=======
+        self.wait_statustext("gps 2: specified as dronecan", timeout=60)
+>>>>>>> 00c0a61edec579a15ade68aabc21efc51ed0e6c1
 
         self.context_push()
         self.set_parameter("ARMING_CHECK", 1 << 3)

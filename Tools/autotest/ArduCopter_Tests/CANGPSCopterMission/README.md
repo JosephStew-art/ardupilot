@@ -40,8 +40,12 @@ The `arducopter.py` file was modified to:
 1. Load these parameters at the start of the CANGPSCopterMission test
 2. Configure both GPS1 and GPS2 as DroneCAN (GPS_TYPE = 9, GPS_TYPE2 = 9)
 3. Disable GPS arming checks (ARMING_CHECK = 4094) to make the test more reliable
+<<<<<<< HEAD
 4. Add a delay to allow GPS to initialize
 5. Make the wait for GPS status messages more flexible by:
    - Using a more general pattern match ("GPS 2" instead of "gps 2: specified as dronecan")
    - Continuing even if the status message is not found
    - Adding more debug output
+=======
+4. Wait for the expected status message about GPS 2 being specified as DroneCAN
+>>>>>>> 00c0a61edec579a15ade68aabc21efc51ed0e6c1
