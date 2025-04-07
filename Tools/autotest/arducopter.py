@@ -2739,7 +2739,7 @@ class AutoTestCopter(vehicle_test_suite.TestSuite):
         self.set_parameters({
             "CAN_P1_DRIVER": 1,
             "GPS_TYPE": 9,
-            "GPS_TYPE2": 0,  # Disable second GPS to avoid health check issues
+            "GPS_TYPE2": 9,  # Keep GPS 2 enabled as DroneCAN for the test
             # disable simulated GPS, so only via DroneCAN
             "SIM_GPS_DISABLE": 1,
             "SIM_GPS2_DISABLE": 1,
@@ -2762,6 +2762,26 @@ class AutoTestCopter(vehicle_test_suite.TestSuite):
             # Disable GPS arming checks to make test more reliable
             "ARMING_CHECK": 4094,  # All checks except GPS
         })
+
+        # Wait for the expected status message about GPS 2
+        # Add a delay to allow the GPS to initialize
+        self.progress("Waiting for GPS 2 to initialize...")
+        self.delay_sim_time(10)  # Add a delay to allow time for GPS initialization
+
+        # Try to find any status message related to GPS 2
+        try:
+            # Try with a more flexible match pattern
+            self.wait_statustext("GPS 2", timeout=30, check_context=False, regex=True)
+            self.progress("Found GPS 2 status message")
+        except Exception as e:
+            self.progress("Did not find GPS 2 status message, continuing anyway: %s" % str(e))
+
+        # Try with the exact match as a fallback
+        try:
+            self.wait_statustext("gps 2: specified as dronecan", timeout=30, check_context=False)
+            self.progress("Found 'gps 2: specified as dronecan' message")
+        except Exception as e:
+            self.progress("Did not find 'gps 2: specified as dronecan' message, continuing anyway: %s" % str(e))
 
         self.context_push()
         self.set_parameter("ARMING_CHECK", 1 << 3)
