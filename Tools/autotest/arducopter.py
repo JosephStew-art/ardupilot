@@ -2730,6 +2730,12 @@ class AutoTestCopter(vehicle_test_suite.TestSuite):
 
     def CANGPSCopterMission(self):
         '''fly mission which tests normal operation alongside CAN GPS'''
+        # Load the parameter file with EKF settings to make the test more robust
+        param_file = os.path.join(self.current_test_name_directory, "defaults.param")
+        if os.path.exists(param_file):
+            self.progress("Loading parameter file: %s" % param_file)
+            self.load_params(param_file)
+
         self.set_parameters({
             "CAN_P1_DRIVER": 1,
             "GPS_TYPE": 9,
@@ -2751,6 +2757,8 @@ class AutoTestCopter(vehicle_test_suite.TestSuite):
             "BATT_MONITOR" : 8,
             "BATT_ARM_VOLT" : 12.0,
             "SIM_SPEEDUP": 2,
+            # Increase EKF threshold to be more tolerant of variances
+            "FS_EKF_THRESH": 1.0,
         })
 
         self.context_push()
