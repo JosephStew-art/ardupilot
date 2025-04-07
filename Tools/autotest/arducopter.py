@@ -2739,7 +2739,7 @@ class AutoTestCopter(vehicle_test_suite.TestSuite):
         self.set_parameters({
             "CAN_P1_DRIVER": 1,
             "GPS_TYPE": 9,
-            "GPS_TYPE2": 0,  # Disable second GPS to avoid health check issues
+            "GPS_TYPE2": 9,  # Keep GPS 2 enabled as DroneCAN for the test
             # disable simulated GPS, so only via DroneCAN
             "SIM_GPS_DISABLE": 1,
             "SIM_GPS2_DISABLE": 1,
@@ -2762,6 +2762,9 @@ class AutoTestCopter(vehicle_test_suite.TestSuite):
             # Disable GPS arming checks to make test more reliable
             "ARMING_CHECK": 4094,  # All checks except GPS
         })
+
+        # Wait for the expected status message about GPS 2
+        self.wait_statustext("gps 2: specified as dronecan", timeout=60)
 
         self.context_push()
         self.set_parameter("ARMING_CHECK", 1 << 3)

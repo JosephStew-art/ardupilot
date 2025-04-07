@@ -26,7 +26,7 @@ The `defaults.param` file contains parameter adjustments to fix both issues:
    - `EK2_MAG_I_GATE`: 400 (increased from default)
 4. GPS Configuration to fix arming issues:
    - `GPS_TYPE`: 9 (DroneCAN GPS)
-   - `GPS_TYPE2`: 0 (Disabled second GPS)
+   - `GPS_TYPE2`: 9 (DroneCAN GPS)
    - `GPS1_CAN_OVRIDE`: 0 (No override)
    - `GPS2_CAN_OVRIDE`: 0 (No override)
 5. Disabled GPS arming checks to make the test more reliable:
@@ -38,5 +38,6 @@ Similar adjustments were made for EK3 parameters as well.
 
 The `arducopter.py` file was modified to:
 1. Load these parameters at the start of the CANGPSCopterMission test
-2. Disable the second GPS (GPS_TYPE2 = 0) to avoid health check issues
+2. Configure both GPS1 and GPS2 as DroneCAN (GPS_TYPE = 9, GPS_TYPE2 = 9)
 3. Disable GPS arming checks (ARMING_CHECK = 4094) to make the test more reliable
+4. Wait for the expected status message about GPS 2 being specified as DroneCAN
