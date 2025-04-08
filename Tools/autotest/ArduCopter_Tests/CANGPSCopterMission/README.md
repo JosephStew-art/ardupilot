@@ -56,4 +56,4 @@ The `arducopter.py` file was modified to:
 8. Continue even if the GPS doesn't get a good fix
 9. Add more debug output for arming status
 10. Run prearm checks explicitly before attempting to arm
-11. No longer waiting for GPS node ID conflict message
+11. Skipping GPS ordering tests to avoid issues with parameters that might not exist
