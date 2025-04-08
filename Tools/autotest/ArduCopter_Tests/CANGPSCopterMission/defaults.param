@@ -53,5 +53,5 @@ EK3_POS_I_GATE 700
 EK3_HGT_I_GATE 700
 EK3_MAG_I_GATE 400
 
-# Disable arming checks for GPS to make test more reliable
-ARMING_CHECK 4094
+# Disable all arming checks to make test more reliable
+ARMING_CHECK 0

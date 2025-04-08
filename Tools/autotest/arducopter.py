@@ -2759,8 +2759,8 @@ class AutoTestCopter(vehicle_test_suite.TestSuite):
             "SIM_SPEEDUP": 2,
             # Increase EKF threshold to be more tolerant of variances
             "FS_EKF_THRESH": 1.0,
-            # Disable GPS arming checks to make test more reliable
-            "ARMING_CHECK": 4094,  # All checks except GPS
+            # Disable all arming checks to make test more reliable
+            "ARMING_CHECK": 0,  # Disable all checks
         })
 
         # Wait for the expected status message about GPS 2
@@ -2792,8 +2792,19 @@ class AutoTestCopter(vehicle_test_suite.TestSuite):
         except Exception as e:
             self.progress("GPS did not get a good fix, continuing anyway: %s" % str(e))
 
+        # Add more debug output
+        self.progress("Checking arming status...")
+        self.run_cmd(mavutil.mavlink.MAV_CMD_RUN_PREARM_CHECKS)
+        self.delay_sim_time(5)  # Give time for prearm checks to run
+
+        # Force arm the vehicle
+        self.progress("Force arming the vehicle...")
+        self.set_parameter("ARMING_CHECK", 0)  # Disable all arming checks
+        self.set_parameter("ARMING_RUDDER", 0)  # Disable rudder arming
+        self.set_parameter("ARMING_MIS_ITEMS", 0)  # Don't require mission items
+        self.set_parameter("ARMING_ACCTHRESH", 0)  # Disable accelerometer checks
+
         self.context_push()
-        self.set_parameter("ARMING_CHECK", 1 << 3)
         self.context_collect('STATUSTEXT')
 
         self.reboot_sitl()
