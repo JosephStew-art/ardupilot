@@ -2,13 +2,11 @@
 # Increase EKF threshold to be more tolerant of variances
 FS_EKF_THRESH 1.0
 
-# GPS Configuration - Use DroneCAN GPS with node ID conflict
+# GPS Configuration - Use DroneCAN GPS
 GPS_TYPE 9
 GPS_TYPE2 9
-GPS1_CAN_OVRIDE 1
-GPS2_CAN_OVRIDE 1
-GPS1_CAN_NODE 125
-GPS2_CAN_NODE 125
+GPS1_CAN_OVRIDE 0
+GPS2_CAN_OVRIDE 0
 
 # GPS Configuration - Make GPS more reliable for testing
 GPS_AUTO_CONFIG 1
