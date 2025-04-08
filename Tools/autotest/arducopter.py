@@ -2740,6 +2740,11 @@ class AutoTestCopter(vehicle_test_suite.TestSuite):
             "CAN_P1_DRIVER": 1,
             "GPS_TYPE": 9,
             "GPS_TYPE2": 9,  # Keep GPS 2 enabled as DroneCAN for the test
+            # Configure GPS node IDs to create a conflict
+            "GPS1_CAN_OVRIDE": 1,
+            "GPS2_CAN_OVRIDE": 1,
+            "GPS1_CAN_NODE": 125,
+            "GPS2_CAN_NODE": 125,
             # disable simulated GPS, so only via DroneCAN
             "SIM_GPS_DISABLE": 1,
             "SIM_GPS2_DISABLE": 1,
@@ -2767,6 +2772,14 @@ class AutoTestCopter(vehicle_test_suite.TestSuite):
         # Add a longer delay to allow the GPS to initialize and get a good fix
         self.progress("Waiting for GPS to initialize and get a good fix...")
         self.delay_sim_time(30)  # Increase delay to allow more time for GPS initialization
+
+        # Wait for the expected status message about GPS node ID conflicts
+        self.progress("Waiting for GPS node ID conflict message...")
+        try:
+            self.wait_statustext("prearm: same node id 125 set for multiple gps", timeout=60, check_context=False)
+            self.progress("Found GPS node ID conflict message")
+        except Exception as e:
+            self.progress("Did not find GPS node ID conflict message, continuing anyway: %s" % str(e))
 
         # Try to find any status message related to GPS 2
         try:

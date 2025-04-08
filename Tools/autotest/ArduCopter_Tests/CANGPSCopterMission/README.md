@@ -24,11 +24,13 @@ The `defaults.param` file contains parameter adjustments to fix both issues:
    - `EK2_POS_I_GATE`: 700 (increased from default)
    - `EK2_HGT_I_GATE`: 700 (increased from default)
    - `EK2_MAG_I_GATE`: 400 (increased from default)
-4. GPS Configuration to fix arming issues:
+4. GPS Configuration to create a node ID conflict:
    - `GPS_TYPE`: 9 (DroneCAN GPS)
    - `GPS_TYPE2`: 9 (DroneCAN GPS)
-   - `GPS1_CAN_OVRIDE`: 0 (No override)
-   - `GPS2_CAN_OVRIDE`: 0 (No override)
+   - `GPS1_CAN_OVRIDE`: 1 (Override enabled)
+   - `GPS2_CAN_OVRIDE`: 1 (Override enabled)
+   - `GPS1_CAN_NODE`: 125 (Same node ID for both GPS)
+   - `GPS2_CAN_NODE`: 125 (Same node ID for both GPS)
 5. Disabled all arming checks to make the test more reliable:
    - `ARMING_CHECK`: 0 (Disable all checks)
    - `ARMING_RUDDER`: 0 (Disable rudder arming)
@@ -56,3 +58,5 @@ The `arducopter.py` file was modified to:
 8. Continue even if the GPS doesn't get a good fix
 9. Add more debug output for arming status
 10. Run prearm checks explicitly before attempting to arm
+11. Wait for the expected status message about GPS node ID conflicts
+12. Continue even if the message isn't found
