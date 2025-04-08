@@ -2819,9 +2819,8 @@ class AutoTestCopter(vehicle_test_suite.TestSuite):
         self.set_parameter("ARMING_CHECK", 0)  # Disable all arming checks
         self.context_stop_collecting('STATUSTEXT')
 
+        # Skip setting CAN_D1_UC_ESC_BM parameter since it might not exist
         self.set_parameters({
-            # use DroneCAN ESCs for flight
-            "CAN_D1_UC_ESC_BM" : 0x0f,
             # this stops us using local servo output, guaranteeing we are
             # flying on DroneCAN ESCs
             "SIM_CAN_SRV_MSK" : 0xFF,

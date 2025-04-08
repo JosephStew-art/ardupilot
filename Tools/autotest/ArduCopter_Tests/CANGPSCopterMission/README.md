@@ -57,3 +57,4 @@ The `arducopter.py` file was modified to:
 9. Add more debug output for arming status
 10. Run prearm checks explicitly before attempting to arm
 11. Skipping GPS ordering tests to avoid issues with parameters that might not exist
+12. Removing problematic parameters (CAN_D1_UC_ESC_BM) that might not exist
