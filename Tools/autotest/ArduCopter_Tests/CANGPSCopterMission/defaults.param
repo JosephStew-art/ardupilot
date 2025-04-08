@@ -8,6 +8,24 @@ GPS_TYPE2 9
 GPS1_CAN_OVRIDE 0
 GPS2_CAN_OVRIDE 0
 
+# GPS Configuration - Make GPS more reliable for testing
+GPS_AUTO_CONFIG 1
+GPS_AUTO_SWITCH 1
+GPS_GNSS_MODE 65
+GPS_SAVE_CFG 2
+GPS_RATE_MS 200
+GPS_RATE_MS2 200
+
+# Simulation parameters to ensure GPS gets a good fix
+SIM_GPS_NOISE 0
+SIM_GPS_NUMSATS 14
+SIM_GPS_GLITCH_X 0
+SIM_GPS_GLITCH_Y 0
+SIM_GPS_GLITCH_Z 0
+SIM_GPS_POS_X 0
+SIM_GPS_POS_Y 0
+SIM_GPS_POS_Z 0
+
 # Adjust EKF2 parameters to be more tolerant of sensor noise
 EK2_ABIAS_P_NSE 0.005
 EK2_GBIAS_P_NSE 0.0001

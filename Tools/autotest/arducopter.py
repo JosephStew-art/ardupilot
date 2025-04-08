@@ -2764,9 +2764,9 @@ class AutoTestCopter(vehicle_test_suite.TestSuite):
         })
 
         # Wait for the expected status message about GPS 2
-        # Add a delay to allow the GPS to initialize
-        self.progress("Waiting for GPS 2 to initialize...")
-        self.delay_sim_time(10)  # Add a delay to allow time for GPS initialization
+        # Add a longer delay to allow the GPS to initialize and get a good fix
+        self.progress("Waiting for GPS to initialize and get a good fix...")
+        self.delay_sim_time(30)  # Increase delay to allow more time for GPS initialization
 
         # Try to find any status message related to GPS 2
         try:
@@ -2782,6 +2782,15 @@ class AutoTestCopter(vehicle_test_suite.TestSuite):
             self.progress("Found 'gps 2: specified as dronecan' message")
         except Exception as e:
             self.progress("Did not find 'gps 2: specified as dronecan' message, continuing anyway: %s" % str(e))
+
+        # Wait for GPS to get a good fix
+        self.progress("Waiting for GPS to get a good fix...")
+        try:
+            # Wait for GPS status to become good with a longer timeout
+            self.wait_gps_fix_type_gte(4, timeout=120, num_sats=10)  # Wait for at least 10 satellites and RTK float or better
+            self.progress("GPS has a good fix")
+        except Exception as e:
+            self.progress("GPS did not get a good fix, continuing anyway: %s" % str(e))
 
         self.context_push()
         self.set_parameter("ARMING_CHECK", 1 << 3)
