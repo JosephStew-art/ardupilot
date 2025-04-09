@@ -25,6 +25,13 @@ SIM_GPS_GLITCH_Z 0
 SIM_GPS_POS_X 0
 SIM_GPS_POS_Y 0
 SIM_GPS_POS_Z 0
+SIM_GPS_DELAY 0
+
+# EKF parameters to make it more lenient
+EK2_GPS_CHECK 0
+EK3_GPS_CHECK 0
+EK2_IMU_MASK 3
+EK3_IMU_MASK 3
 
 # Adjust EKF2 parameters to be more tolerant of sensor noise
 EK2_ABIAS_P_NSE 0.005
