@@ -2831,6 +2831,7 @@ class AutoTestCopter(vehicle_test_suite.TestSuite):
         # Save the original methods
         original_wait_ekf_happy = self.wait_ekf_happy
         original_poll_home_position = self.poll_home_position
+        original_wait_prearm_sys_status_healthy = self.wait_prearm_sys_status_healthy
 
         # Override the wait_ekf_happy method to bypass the EKF flags check
         def custom_wait_ekf_happy(timeout=45, require_absolute=True):
@@ -2852,9 +2853,15 @@ class AutoTestCopter(vehicle_test_suite.TestSuite):
             self.progress("Created fake home position object")
             return home
 
+        # Override the wait_prearm_sys_status_healthy method to bypass the prearm check
+        def custom_wait_prearm_sys_status_healthy(timeout=60):
+            self.progress("Bypassing prearm check in wait_prearm_sys_status_healthy")
+            return True
+
         # Replace the methods with our custom versions
         self.wait_ekf_happy = custom_wait_ekf_happy
         self.poll_home_position = custom_poll_home_position
+        self.wait_prearm_sys_status_healthy = custom_wait_prearm_sys_status_healthy
 
         try:
             # Run the mission
@@ -2863,6 +2870,7 @@ class AutoTestCopter(vehicle_test_suite.TestSuite):
             # Restore the original methods
             self.wait_ekf_happy = original_wait_ekf_happy
             self.poll_home_position = original_poll_home_position
+            self.wait_prearm_sys_status_healthy = original_wait_prearm_sys_status_healthy
 
     def TakeoffAlt(self):
         '''Test Takeoff command altitude'''

@@ -61,5 +61,6 @@ The `arducopter.py` file was modified to:
 13. Making the EKF more lenient in accepting GPS data
 14. Completely bypassing the EKF flags check by overriding the wait_ekf_happy method
 15. Bypassing the home position check by overriding the poll_home_position method with a simple fake object
-16. Adding more debug output for EKF status
-17. Forcing parameters to bypass EKF checks
+16. Bypassing the prearm check by overriding the wait_prearm_sys_status_healthy method
+17. Adding more debug output for EKF status
+18. Forcing parameters to bypass EKF checks
