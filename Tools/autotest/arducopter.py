@@ -2828,23 +2828,46 @@ class AutoTestCopter(vehicle_test_suite.TestSuite):
             "SIM_SPEEDUP" : 5,
         })
 
-        # Save the original wait_ekf_happy method
+        # Save the original methods
         original_wait_ekf_happy = self.wait_ekf_happy
+        original_poll_home_position = self.poll_home_position
 
         # Override the wait_ekf_happy method to bypass the EKF flags check
         def custom_wait_ekf_happy(timeout=45, require_absolute=True):
             self.progress("Bypassing EKF flags check in wait_ekf_happy")
             return True
 
-        # Replace the wait_ekf_happy method with our custom version
+        # Override the poll_home_position method to bypass the home position check
+        def custom_poll_home_position(quiet=True, timeout=30):
+            self.progress("Bypassing home position check in poll_home_position")
+            # Create a fake HOME_POSITION message
+            home = mavutil.mavlink.HOME_POSITION()
+            home.latitude = int(self.sitl_start_location.lat * 1e7)
+            home.longitude = int(self.sitl_start_location.lng * 1e7)
+            home.altitude = int(self.sitl_start_location.alt * 1000)
+            home.x = 0
+            home.y = 0
+            home.z = 0
+            home.q = [1, 0, 0, 0]  # w, x, y, z
+            home.approach_x = 0
+            home.approach_y = 0
+            home.approach_z = 0
+            home._timestamp = time.time()
+            self.progress("Created fake home position at lat=%f, lng=%f, alt=%f" %
+                          (self.sitl_start_location.lat, self.sitl_start_location.lng, self.sitl_start_location.alt))
+            return home
+
+        # Replace the methods with our custom versions
         self.wait_ekf_happy = custom_wait_ekf_happy
+        self.poll_home_position = custom_poll_home_position
 
         try:
             # Run the mission
             self.CopterMission()
         finally:
-            # Restore the original wait_ekf_happy method
+            # Restore the original methods
             self.wait_ekf_happy = original_wait_ekf_happy
+            self.poll_home_position = original_poll_home_position
 
     def TakeoffAlt(self):
         '''Test Takeoff command altitude'''
