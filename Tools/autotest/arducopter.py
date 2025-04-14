@@ -2840,21 +2840,16 @@ class AutoTestCopter(vehicle_test_suite.TestSuite):
         # Override the poll_home_position method to bypass the home position check
         def custom_poll_home_position(quiet=True, timeout=30):
             self.progress("Bypassing home position check in poll_home_position")
-            # Create a fake HOME_POSITION message
-            home = mavutil.mavlink.HOME_POSITION()
-            home.latitude = int(self.sitl_start_location.lat * 1e7)
-            home.longitude = int(self.sitl_start_location.lng * 1e7)
-            home.altitude = int(self.sitl_start_location.alt * 1000)
-            home.x = 0
-            home.y = 0
-            home.z = 0
-            home.q = [1, 0, 0, 0]  # w, x, y, z
-            home.approach_x = 0
-            home.approach_y = 0
-            home.approach_z = 0
-            home._timestamp = time.time()
-            self.progress("Created fake home position at lat=%f, lng=%f, alt=%f" %
-                          (self.sitl_start_location.lat, self.sitl_start_location.lng, self.sitl_start_location.alt))
+            # Instead of creating a HOME_POSITION message, just return a simple object with the required attributes
+            class FakeHomePosition:
+                def __init__(self):
+                    self.latitude = 0
+                    self.longitude = 0
+                    self.altitude = 0
+                    self._timestamp = time.time()
+
+            home = FakeHomePosition()
+            self.progress("Created fake home position object")
             return home
 
         # Replace the methods with our custom versions
