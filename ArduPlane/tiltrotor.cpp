@@ -91,6 +91,13 @@ const AP_Param::GroupInfo Tiltrotor::var_info[] = {
     // @User: Standard
     AP_GROUPINFO("RAT_DN_FN", 11, Tiltrotor, max_rate_down_final_dps, 0),
 
+    // @Param: ROLL_DIFF
+    // @DisplayName: Tiltrotor roll differential thrust gainAdd commentMore actions
+    // @Description: For use on tilt rotors with coaxial pairs on the tilt axle. This prevents a roll imbalance from the front motors generating more back-torque than the back, causing the ailerons to fight them. This value is the difference, in percent, at full scale thrust. e.g. 0.1 means that the front motors will be 10% more than the back motors at full throttle. The difference scales with throttle, and this parameter is the full-scale fractional difference of the total thrust, so 0.1 means that, at 60% throttle, the front motors will be 63% and the back 57%. The sign of this depends whether the front motors spin clockwise or counter-clockwise (TODO: figure out which, so I can explain it to people).
+    // @Range: -0.3 0.3
+    // @Increment: 0.01
+    AP_GROUPINFO("ROLL_DIFF", 12, Tiltrotor, roll_diff, 0),
+
     AP_GROUPEND
 };
 
@@ -256,7 +263,7 @@ void Tiltrotor::continuous_update(void)
         if (!quadplane.motor_test.running) {
             // the motors are all the way forward, start using them for fwd thrust
             const uint16_t mask = is_zero(current_throttle)?0U:tilt_mask.get();
-            motors->output_motor_mask(current_throttle, mask, plane.rudder_dt);
+            motors->output_motor_mask(current_throttle, mask, plane.rudder_dt, current_throttle * roll_diff);
         }
         return;
     }
@@ -387,7 +394,7 @@ void Tiltrotor::binary_update(void)
         if (current_tilt >= 1) {
             const uint16_t mask = is_zero(new_throttle)?0U:tilt_mask.get();
             // the motors are all the way forward, start using them for fwd thrust
-            motors->output_motor_mask(new_throttle, mask, plane.rudder_dt);
+            motors->output_motor_mask(new_throttle, mask, plane.rudder_dt, current_throttle * roll_diff);
         }
     } else {
         binary_slew(false);

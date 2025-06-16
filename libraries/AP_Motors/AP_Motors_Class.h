@@ -251,6 +251,10 @@ public:
     // return the pitch factor of any motor
     virtual float       get_pitch_factor(uint8_t i) { return 0.0f; }
 
+    // return the yaw factor of any motor, this is used for tilt rotors and tail sittersAdd commentMore actions
+    // using copter motors for forward flight
+    virtual float       get_yaw_factor(uint8_t i) { return 0.0f; }
+
     // return whether a motor is enabled or not
     virtual bool        is_motor_enabled(uint8_t i) { return false; }
 

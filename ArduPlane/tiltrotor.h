@@ -80,6 +80,7 @@ public:
     AP_Float fixed_gain;
     AP_Float flap_angle_deg;
     AP_Int16 max_rate_down_final_dps;
+    AP_Float roll_diff;
 
     float current_tilt;
     float current_throttle;
