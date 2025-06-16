@@ -10,6 +10,7 @@ on:
     branches:
       - ArgenTech
       - master
+      - TiltY6_Roll_Comp
     paths-ignore:
       # remove non chibios HAL
       - 'libraries/AP_HAL_Linux/**'
