@@ -11,6 +11,7 @@ on:
       - ArgenTech
       - master
       - TiltY6_Roll_Comp
+      - test
     paths-ignore:
       # remove non chibios HAL
       - 'libraries/AP_HAL_Linux/**'
