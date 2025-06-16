@@ -71,6 +71,10 @@ public:
     // return the pitch factor of any motor
     float               get_pitch_factor(uint8_t i) override { return _pitch_factor[i]; }
 
+    // return the yaw factor of any motor, this is used for tilt rotors and tail sittersAdd commentMore actions
+    // using copter motors for forward flight
+    float               get_yaw_factor(uint8_t i) override { return _yaw_factor[i]; }
+    
     // disable the use of motor torque to control yaw. Used when an external mechanism such
     // as vectoring is used for yaw control
     void                disable_yaw_torque(void) override;

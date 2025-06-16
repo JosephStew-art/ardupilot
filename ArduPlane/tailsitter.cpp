@@ -337,7 +337,7 @@ void Tailsitter::output(void)
 
         if (!quadplane.assisted_flight) {
             // set AP_MotorsMatrix throttles for forward flight
-            motors->output_motor_mask(throttle, motor_mask, plane.rudder_dt);
+            motors->output_motor_mask(throttle, motor_mask, plane.rudder_dt, 0);
 
             // in forward flight: set motor tilt servos and throttles using FW controller
             if (vectored_forward_gain > 0) {
