@@ -14,3 +14,6 @@ USB_STRING_MANUFACTURER "CubePilot"
 USB_STRING_PRODUCT "CubeOrange-FF6"
 
 APJ_BOARD_ID 1034
+
+# Use CubeOrange bootloader
+BOOTLOADER_DEV_LIST CubeOrange
