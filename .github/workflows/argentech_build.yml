@@ -187,6 +187,7 @@ jobs:
           boards=(
             "CubeBlack"
             "CubeOrange"
+            "CubeOrange-FF6"
             "CubeOrangePlus"
             "Pixhawk1"
             "Pixhawk4"
