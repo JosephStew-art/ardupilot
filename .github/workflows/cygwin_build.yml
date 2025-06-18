@@ -158,7 +158,7 @@ jobs:
 
       - uses: cygwin/cygwin-install-action@master
         with:
-          packages: cygwin64 gcc-g++=10.2.0-1 ccache python37 python37-future python37-lxml python37-pip python37-setuptools python37-wheel git procps gettext
+          packages: cygwin64 gcc-g++ ccache python37 python37-future python37-lxml python37-pip python37-setuptools python37-wheel git procps gettext make
           add-to-path: false
       # Put ccache into github cache for faster build
       - name: setup ccache
@@ -188,8 +188,10 @@ jobs:
         shell: C:\cygwin\bin\bash.exe -eo pipefail '{0}'
         run: >-
           ln -sf /usr/bin/python3.7 /usr/bin/python && ln -sf /usr/bin/pip3.7 /usr/bin/pip &&
+          python -m pip install --progress-bar off --upgrade pip &&
           python -m pip install --progress-bar off empy==3.3.4 pexpect &&
           python -m pip install --progress-bar off dronecan --upgrade &&
+          python -m pip install --progress-bar off pymavlink &&
           cp /usr/bin/ccache /usr/local/bin/ &&
           cd /usr/local/bin && ln -s ccache /usr/local/bin/gcc &&
           ln -s ccache /usr/local/bin/g++ &&
@@ -202,9 +204,12 @@ jobs:
         shell: C:\cygwin\bin\bash.exe -eo pipefail '{0}'
         run: >-
           git config --global --add safe.directory /cygdrive/d/a/${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}/${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/} &&
+          git config --global --add safe.directory '*' &&
           export PATH=/usr/local/bin:/usr/bin:$(cygpath ${SYSTEMROOT})/system32 &&
           source ~/ccache.conf &&
-          Tools/scripts/cygwin_build.sh &&
+          echo "Starting Cygwin build..." &&
+          bash -x Tools/scripts/cygwin_build.sh &&
+          echo "Build completed successfully" &&
           ccache -s
 
       - name: Check build files
